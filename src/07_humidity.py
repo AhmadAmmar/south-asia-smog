@@ -23,12 +23,17 @@ def rh(i):
     return e.divide(es).multiply(100).rename("rh")
 
 
+def day_rh(x):
+    return ee.Image(ee.Algorithms.If(x.size(), x.map(rh).mean().toFloat(), ee.Image.constant(0).rename("rh").updateMask(0).toFloat()))
+
+
 def month(y, m):
     start = ee.Date.fromYMD(y, m, 1)
-    n = (pd.Timestamp(y, m, 1) + pd.offsets.MonthEnd(0)).day
+    end = min(pd.Timestamp(y, m, 1) + pd.offsets.MonthEnd(0), pd.Timestamp.today().normalize() - pd.Timedelta(days=1))
+    n = end.day
     h = ee.ImageCollection("ECMWF/ERA5/HOURLY").filterDate(start, start.advance(1, "month"))
     img = ee.ImageCollection(ee.List.sequence(0, n - 1).map(
-        lambda d: h.filterDate(start.advance(d, "day"), start.advance(ee.Number(d).add(1), "day")).map(rh).mean().toFloat())).toBands()
+        lambda d: day_rh(h.filterDate(start.advance(d, "day"), start.advance(ee.Number(d).add(1), "day"))))).toBands()
     img = img.rename([f"d{d}" for d in range(n)])
     for k in range(8):
         try:
@@ -43,8 +48,15 @@ def month(y, m):
 
 
 if __name__ == "__main__":
+    f = S.OUT / "city_humidity.csv"
+    old = pd.read_csv(f) if f.exists() else pd.DataFrame(columns=["city", "date", "rh"])
+    have = set(old.date.str[:7])
     rows = []
     for y, m in S.months():
+        if f"{y}-{m:02d}" in have and not S.fresh(y, m):
+            continue
         rows += month(y, m)
-    pd.DataFrame(rows).to_csv(S.OUT / "city_humidity.csv", index=False)
+    new = pd.DataFrame(rows)
+    out = pd.concat([old[~old.date.str[:7].isin(set(new.date.str[:7]) if len(new) else set())], new])
+    out.sort_values(["city", "date"]).to_csv(f, index=False)
     print(len(rows), "rows")

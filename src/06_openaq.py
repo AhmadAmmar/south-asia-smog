@@ -1,4 +1,4 @@
-"""Ground PM2.5 from OpenAQ (API v3): daily means at monitors within 25 km of each city, 2019 to now.
+"""Ground PM2.5 from OpenAQ (API v3): daily means at monitors within 25 km of each city, 2019 to today.
 
 The API key is read from the OPENAQ_API_KEY environment variable (Windows user variable as a fallback); it is never
 written to any file.
@@ -69,7 +69,7 @@ def sensors(city, lon, lat):
 def daily(sensor):
     out, page = [], 1
     while True:
-        j = get(f"sensors/{sensor}/days", date_from="2019-01-01", date_to="2026-11-01", limit=1000, page=page)
+        j = get(f"sensors/{sensor}/days", date_from="2019-01-01", date_to=pd.Timestamp.today().strftime("%Y-%m-%d"), limit=1000, page=page)
         res = j["results"]
         out += [{"date": r["period"]["datetimeFrom"]["local"][:10], "pm25": r["value"],
                  "coverage": (r.get("coverage") or {}).get("percentComplete")} for r in res]

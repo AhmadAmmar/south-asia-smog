@@ -1,4 +1,4 @@
-"""Daily fire detections over Punjab (both sides of the border, 73-77.5 E, 29-32.5 N), 15 Sep to 15 Dec, 2019-2025,
+"""Daily fire detections over Punjab (both sides of the border, 73-77.5 E, 29-32.5 N), 15 Sep to 15 Dec, 2019 to the present season,
 split by satellite and overpass: Terra (about 10:30 and 22:30 local) and Aqua (about 13:30 and 01:30).
 
 If farmers moved burning to late afternoon, after the Aqua overpass, the daytime detections fall while the share
@@ -49,6 +49,8 @@ def season(year):
 
 if __name__ == "__main__":
     frames = []
-    for y in range(2019, 2026):
+    for y in range(2019, pd.Timestamp.today().year + 1):   # the current season is partial up to today
         t = time.time(); frames.append(season(y)); print(y, f"{time.time() - t:.0f}s", flush=True)
-    pd.concat(frames).to_csv(S.OUT / "punjab_fires_daily.csv", index=False)
+    out = pd.concat(frames)
+    out = out[pd.to_datetime(out.date) < pd.Timestamp.today().normalize()]       # no rows for days not yet observed
+    out.to_csv(S.OUT / "punjab_fires_daily.csv", index=False)

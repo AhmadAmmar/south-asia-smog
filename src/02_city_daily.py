@@ -1,4 +1,4 @@
-"""Daily values in a 25 km radius around each city, 2019 to 2026: satellite columns and indices plus weather.
+"""Daily values in a 25 km radius around each city, 2019 to today: satellite columns and indices plus weather.
 
     python src/02_city_daily.py          resumes per variable and month; writes outputs/city_daily.csv
 
@@ -29,7 +29,9 @@ def stacked(daily, ndays, scale_m, cols):
 
 
 def ndays(year, month):
-    return (pd.Timestamp(year, month, 1) + pd.offsets.MonthEnd(0)).day
+    """Days in the month, or up to yesterday for the current month."""
+    end = min(pd.Timestamp(year, month, 1) + pd.offsets.MonthEnd(0), pd.Timestamp.today().normalize() - pd.Timedelta(days=1))
+    return max(end.day if end.month == month and end.year == year else 0, 0)
 
 
 def sat_month(var, year, month):
@@ -60,7 +62,9 @@ def met_month(year, month):
         u, v = x.select("u_component_of_wind_10m").mean(), x.select("v_component_of_wind_10m").mean()
         ws = x.map(lambda i: i.select("u_component_of_wind_10m").hypot(i.select("v_component_of_wind_10m"))).mean().rename("wind")
         p = x.select("total_precipitation").sum().multiply(1000).rename("precip")
-        return m.addBands([ws, p, u.rename("u10"), v.rename("v10")]).toFloat()
+        img = m.addBands([ws, p, u.rename("u10"), v.rename("v10")]).toFloat()
+        empty = ee.Image.constant([0] * len(MET)).rename(MET).updateMask(0).toFloat()     # ERA5 not yet available for this day
+        return ee.Image(ee.Algorithms.If(x.size(), img, empty))
     n = ndays(year, month)
     return stacked(ee.List.sequence(0, n - 1).map(per_day), n, 27830, MET), MET
 
@@ -89,7 +93,7 @@ if __name__ == "__main__":
     for year, month in S.months():
         for var in [*S.VARS, "met"]:
             f = PARTS / f"{var}_{year}-{month:02d}.csv"
-            if f.exists():
+            if f.exists() and not S.fresh(year, month):
                 continue
             t0 = time.time()
             if var == "met":

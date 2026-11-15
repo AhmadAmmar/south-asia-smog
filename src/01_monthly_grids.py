@@ -89,7 +89,7 @@ if __name__ == "__main__":
     want = sys.argv[1:] or [*S.VARS, "fire"]
     for var in want:
         for y, m in S.months():
-            if (S.DATA / "grids" / var / f"{y}-{m:02d}.npz").exists():
+            if (S.DATA / "grids" / var / f"{y}-{m:02d}.npz").exists() and not S.fresh(y, m):
                 continue
             img = fires(y, m) if var == "fire" else daily_mean(*S.VARS[var][:3], y, m)
             t0 = time.time()

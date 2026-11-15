@@ -97,7 +97,8 @@ def fig_smog_from_space(G, y=None, m=11):
             draw(ax, a, v, title=label(v)[0])
     for ax in axs.flat[len(vs):]:
         ax.set_visible(False)
-    fig.suptitle(f"Seeing smog from space: South Asia, {pd.Timestamp(y, m, 1):%B %Y} (monthly means, Sentinel-5P, MODIS MAIAC, FIRMS)", fontsize=10)
+    part = f" 1–{pd.Timestamp.today() - pd.Timedelta(days=1):%d}, month in progress" if (y, m) == (pd.Timestamp.today().year, pd.Timestamp.today().month) else ""
+    fig.suptitle(f"Seeing smog from space: South Asia, {pd.Timestamp(y, m, 1):%B %Y}{part} (means, Sentinel-5P, MODIS MAIAC, FIRMS)", fontsize=10)
     save(fig, "fig_smog_from_space")
     return y
 

@@ -4,6 +4,7 @@ Every variable is a column amount or index seen from space, not a surface concen
 (TROPOMI) Level 3 products in Earth Engine are already gridded and quality-filtered by the harpconvert step
 (qa_value > 0.75 for NO2, HCHO, SO2; > 0.5 for CO, AER_AI); see each dataset's Earth Engine catalogue page.
 """
+from datetime import date
 from pathlib import Path
 
 import ee
@@ -36,6 +37,13 @@ CITIES = {
 }
 
 
+def fresh(y, m, months_back=2):
+    """True for the current and the previous months_back months: data may still be arriving (Sentinel-5P offline
+    products about a week, ERA5 in Earth Engine up to a few months), so these are downloaded again on every run."""
+    t = date.today()
+    return (t.year * 12 + t.month) - (y * 12 + m) <= months_back
+
+
 def init():
     ee.Initialize(project=PROJECT)
     ee.data.setDeadline(180000)          # no request may hang for more than 3 minutes; callers retry
@@ -46,7 +54,10 @@ def grid():
         ["scaleX", "shearX", "translateX", "shearY", "scaleY", "translateY"], TRANSFORM)), "crsCode": "EPSG:4326"}
 
 
-def months(start=(2019, 1), end=(2026, 10)):
+def months(start=(2019, 1), end=None):
+    """Months from start to the present month (series always run to today; the current month is partial)."""
+    today = date.today()
+    end = end or (today.year, today.month)
     y, m = start
     while (y, m) <= end:
         yield y, m
