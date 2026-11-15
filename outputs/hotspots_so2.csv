@@ -1,0 +1,31 @@
+lon,lat,peak,enhancement,z,cells,class,nearest
+88.85,15.05,1264.1,1245.41,200.35,2,unattributed,
+82.75,24.05,987.13,834.52,134.25,164,coal power,"RIHAND (Coal, 3000 MW, 5 km)"
+84.05,21.75,836.08,596.05,95.89,372,coal power,"STERLITE TPP (Coal, 2400 MW, 7 km)"
+85.05,21.05,737.63,527.8,84.91,143,coal power,"TALCHER STPS (Coal, 3000 MW, 6 km)"
+79.45,11.55,509.23,463.52,74.57,101,coal power,"NEYVELI TPS EXP -II (Coal, 500 MW, 1 km)"
+79.05,21.25,486.93,349.32,56.19,105,coal power,"KORADI (Coal, 1940 MW, 5 km)"
+79.45,18.75,448.35,346.09,55.68,80,coal power,"R_GUNDEM STPS (Coal, 2600 MW, 1 km)"
+60.85,36.45,548.09,341.82,54.99,147,unattributed,
+79.25,19.95,474.53,330.85,53.22,72,coal power,"CHANDRAPUR_Coal (Coal, 3340 MW, 8 km)"
+69.45,22.75,266.84,189.93,30.55,80,coal power,"MUNDRA UMPP (Coal, 4000 MW, 11 km)"
+70.95,22.75,260.49,183.39,29.5,60,unattributed,
+83.05,17.55,254.78,179.25,28.84,75,coal power,"SIMHADRI (Coal, 2000 MW, 6 km)"
+77.95,34.65,186.45,178.77,28.76,2,unattributed,
+75.75,36.05,161.88,160.55,25.83,3,unattributed,
+85.75,25.45,238.75,154.86,24.91,28,coal power,"BARH STPP II (Coal, 1320 MW, 4 km)"
+77.35,16.35,195.89,145.52,23.41,20,coal power,"RAICHUR (Coal, 1720 MW, 1 km)"
+69.15,36.95,254.64,144.89,23.31,28,unattributed,
+87.25,23.45,295.44,142.95,23.0,92,coal power,"DURGAPUR (Coal, 350 MW, 9 km)"
+80.65,17.65,215.78,139.31,22.41,29,coal power,"K_GUDEM (Coal, 720 MW, 6 km)"
+80.35,13.25,187.64,135.04,21.72,34,coal power,"NORTH CHENNAI (Coal, 630 MW, 3 km)"
+86.25,22.75,296.32,131.47,21.15,24,coal power,"JOJBERA (Coal, 428 MW, 1 km)"
+76.85,36.75,147.09,130.13,20.93,14,unattributed,
+71.75,35.05,265.36,130.11,20.93,310,unattributed,
+76.15,32.75,236.01,129.73,20.87,98,unattributed,
+75.25,29.85,247.1,129.41,20.82,16,coal power,"TALWANDI SABO (Coal, 1980 MW, 8 km)"
+84.15,24.75,237.17,128.1,20.61,23,unattributed,
+73.35,31.45,276.2,127.06,20.44,21,city,"Faisalabad (pop. 2.6 M, 23 km)"
+77.65,35.35,130.9,126.63,20.37,1,unattributed,
+88.15,22.05,271.22,123.92,19.93,27,coal power,"HALDIA (Coal, 600 MW, 7 km)"
+88.15,27.65,165.46,122.63,19.73,1,unattributed,

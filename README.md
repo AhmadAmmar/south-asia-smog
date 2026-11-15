@@ -32,6 +32,14 @@ satellite signals, never as an AQI.
 | `src/02_city_daily.py` | Daily values within 25 km of 12 cities, with ERA5 weather |
 | `src/10_maps.py` | Smog from space, season against monsoon, monthly climatology, longitude–time, satellite smog index, trends |
 | `src/20_city_charts.py` | Seasonal cycles, smog calendars, weather and fires against pollution |
+| `src/03_fire_timing.py` | Daily Punjab fire detections by satellite overpass (Terra, Aqua; day, night) |
+| `src/04_episode.py` | Daily NO₂, AOD, aerosol index and fires for one episode |
+| `src/05_point_sources.py` | Power plants (WRI GPPD) and cities (Natural Earth) for attribution |
+| `src/31_hotspots.py` | NO₂ and SO₂ hotspots, attribution to plants and cities, SO₂/NO₂ fingerprints, fire seasons |
+| `src/32_city_analysis.py` | Weather on anomalies, AOD per km of mixing layer, fire-to-smog lag, fire timing |
+| `src/40_episode_animation.py` | Day-by-day animation of an episode |
+
+Figures and maps: `figures/` (PNG and PDF; the animation as GIF). Tables: `outputs/`.
 
 Earth Engine code-editor version: `earth-engine-code/scripts/air-quality/south_asia_smog_monthly_grids.js`.
 Decisions, problems met and their fixes: `docs/record.md`.

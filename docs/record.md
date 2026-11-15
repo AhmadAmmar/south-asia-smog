@@ -95,3 +95,59 @@ Delhi's AOD peak is mid-November (1.3), the stubble-burning and Diwali weeks.
   (both peak in December); to separate, use anomalies from the daily climatology.
 - The chart title earlier claimed "a shallow mixing layer traps aerosol"; the data do not show it in column AOD, so
   the title now states only what is plotted.
+
+## 2026-11-15: hotspots and sources, fire timing, surface proxy, fire lag, episode
+
+**Hotspots and sources** (`src/05_point_sources.py`, `src/31_hotspots.py`; `outputs/hotspots_*.csv`,
+`fig_hotspots_no2`, `fig_hotspots_so2`, `fig_fingerprint`, `fig_fire_seasons`). Enhancement over a 2° running median of
+the 2019–2026 mean; clusters above 4 robust standard deviations; attributed to the nearest thermal plant ≥ 300 MW
+(WRI GPPD v1.3, 1 102 plants in the region) or city ≥ 300 000 (Natural Earth) within 30 km.
+- NO₂, top 30: 19 coal plants, 5 gas/oil plants, 2 cities (Islamabad, Lahore), 4 unattributed. Top five: Rihand/
+  Singrauli (+309 µmol m⁻²), Korba, Kamalanga (Talcher), Haripur (Dhaka), Ramagundam. Delhi's peak sits on Badarpur.
+- SO₂, top 30: 17 coal plants (Rihand, Sterlite/Jharsuguda, Talcher, Neyveli, Koradi, Ramagundam, Chandrapur, Mundra).
+  Unattributed but known: 36.4° N 60.8° E is the Khangiran (Shahid Hasheminejad) sour-gas refinery in Iran; 22.8° N
+  71.0° E is the Morbi ceramic cluster in Gujarat. The largest SO₂ "hotspot", 15.0° N 88.8° E in the open Bay of Bengal,
+  has no source and is treated as a retrieval artefact.
+- Fingerprints: median SO₂/NO₂ enhancement ratio is 2.2 at coal plants against 0.4–0.6 at cities and gas plants, so the
+  ratio separates coal from traffic and gas. Unattributed NO₂ hotspot 21 (24.65° N 84.15° E) has a coal-like ratio
+  (3.4) and lies at Nabinagar, Bihar, where large coal units were commissioned after the inventory; hotspots 11 and 24
+  (Chittorgarh and Kishangarh–Beawar, Rajasthan) have low ratios and match cement and stone clusters. These are leads,
+  not confirmed attributions.
+- CO and HCHO were dropped from the hotspot method: the 2° background fails at the Himalayan front, where the column
+  falls with surface pressure, so their "hotspots" were terrain edges.
+- Fires: Oct–Nov detections concentrate in Punjab and Haryana (rice residue), with smaller clusters in Madhya Pradesh;
+  Mar–May fires are spread over central India and the north-east hills (wheat residue and forest burning).
+
+**Fire timing** (`src/03_fire_timing.py`, MOD14A1/MYD14A1, Punjab both sides, 15 Sep–15 Dec; `fig_fire_timing`).
+
+| Year | Terra ~10:30 | Aqua ~13:30 | Aqua / Terra | Night share |
+|---|---|---|---|---|
+| 2019 | 1 628 | 19 167 | 12 | 0.03 % |
+| 2021 | 3 810 | 36 579 | 10 | 0.03 % |
+| 2023 | 298 | 17 233 | 58 | 0.09 % |
+| 2024 | 168 | 9 369 | 56 | 0.92 % |
+| 2025 | 64 | 8 666 | 135 | 0.39 % |
+
+Morning detections fell 98 % from 2021 to 2025, early-afternoon detections 76 %. Burning has moved later in the day.
+Fires lit after about 14:00 are missed by both satellites, so the true fall in burning is smaller than either number;
+how much smaller needs a geostationary sensor (e.g. INSAT-3D or Himawari-type hourly data).
+
+**Weather on anomalies** (`src/32_city_analysis.py`, `outputs/weather_correlations.csv`, `fig_anomaly_weather`).
+With the seasonal cycle removed, smog-season NO₂ still falls as mixing height rises (Delhi −0.49, Lahore −0.48,
+Peshawar −0.51): the link is day-to-day meteorology, not only the shared winter cycle. AOD stays uncorrelated with
+mixing height (−0.08 to 0.30) and falls with wind.
+
+**Surface proxy** (AOD per km of mixing layer, not PM2.5; `fig_surface_proxy`). It tracks mixing height and wind
+as surface pollution should (anomaly ρ with wind −0.52 Lahore, −0.55 Delhi). It peaks in the last days of December
+in Lahore, Delhi and Peshawar and in mid-January in Dhaka and Kolkata, later than column AOD (mid-November).
+Calibration to µg m⁻³ needs ground monitors (OpenAQ key pending) and humidity.
+
+**Fire to smog lag** (`outputs/fire_lag.csv`, `fig_fire_lag`), 15 Oct–30 Nov 2019–2025. Correlation of Punjab fires
+with Delhi AOD peaks two days later (ρ 0.32 all days, 0.42 on north-west wind days); Lahore the same (0.27, 0.37).
+Both fires and AOD rise through the season, which inflates all lags; the peak at 2 days and the stronger link with
+north-west wind are the transport signal.
+
+**Episode** (`src/04_episode.py`, `src/40_episode_animation.py`; `figures/episode_2024-10-20_2024-11-30.gif`,
+`fig_episode_peak`). The worst day on the plain was 11 November 2024 (plain-mean AOD 0.97): a continuous plume from the
+Punjab fires along the plain to Patna. Over Lahore itself both MAIAC and TROPOMI are blank that day: the densest smog
+and fog are flagged as cloud, so satellites miss the worst hours of the worst places.
