@@ -35,6 +35,9 @@ satellite signals, never as an AQI.
 | `src/03_fire_timing.py` | Daily Punjab fire detections by satellite overpass (Terra, Aqua; day, night) |
 | `src/04_episode.py` | Daily NO₂, AOD, aerosol index and fires for one episode |
 | `src/05_point_sources.py` | Power plants (WRI GPPD) and cities (Natural Earth) for attribution |
+| `src/06_openaq.py` | Ground PM2.5 from reference monitors (OpenAQ v3; needs `OPENAQ_API_KEY`) |
+| `src/07_humidity.py` | Daily relative humidity per city from ERA5 |
+| `src/33_pm25_calibration.py` | AOD against ground PM2.5; calibrated, cross-validated PM2.5 estimate |
 | `src/31_hotspots.py` | NO₂ and SO₂ hotspots, attribution to plants and cities, SO₂/NO₂ fingerprints, fire seasons |
 | `src/32_city_analysis.py` | Weather on anomalies, AOD per km of mixing layer, fire-to-smog lag, fire timing |
 | `src/40_episode_animation.py` | Day-by-day animation of an episode |

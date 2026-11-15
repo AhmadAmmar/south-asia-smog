@@ -178,3 +178,36 @@ plain-wide peak depends on stagnant weather as much as on fires.
 
 **Copernicus CDS:** the key in `~/.cdsapirc` works and the ERA5 single-levels licence is accepted (test download on
 2026-11-15). This project gets ERA5 through Earth Engine, so it does not depend on CDS.
+
+## 2026-11-15: ground PM2.5 (OpenAQ) and a calibrated satellite estimate
+
+**Ground data** (`src/06_openaq.py`; key read from the `OPENAQ_API_KEY` user variable, never written to a file).
+Reference monitors only, up to 15 per city within 25 km: CPCB in Delhi, Kolkata, Lucknow, Mumbai and Patna;
+US embassy and consulate monitors (StateAir, AirNow) in Lahore, Islamabad, Peshawar, Karachi, Dhaka, Kathmandu and
+Colombo (one or two each). 65 767 sensor-days; city value = median of monitors with at least 75 % hourly coverage.
+Low-cost sensors (AirGradient, Hawanama, Clarity; dozens in Lahore since 2025) are left out: uncorrected, they read
+high in humid air. Humidity from ERA5 dew point (`src/07_humidity.py`).
+
+**Skill** (`src/33_pm25_calibration.py`, `outputs/pm25_model_skill.csv`, `fig_pm25_skill`, `fig_pm25_scatter`).
+Log–log least squares with a separate intercept per city; every year predicted from the other years.
+
+| Model | Terms | R² (log), all cities | RMSE (µg m⁻³) |
+|---|---|---|---|
+| A | AOD | 0.28 (almost all from the city intercepts; within a city 0.00–0.16) | 55 |
+| B | + mixing height, humidity | 0.59 | |
+| C | + wind, month | 0.71 | |
+| D | + NO₂ column | 0.73 | 37 (mean observed 71) |
+
+- Column AOD alone says almost nothing about day-to-day ground PM2.5 in any city (Lahore R² 0.00, Delhi 0.09).
+  Adding mixing height and humidity lifts it to 0.28–0.63, as the physics predicts: slopes in model D are +0.30 for
+  log AOD, −0.18 for log mixing height and +0.51 for log(1 − RH) (humid air swells particles, so the same AOD means
+  fewer micrograms).
+- Rank correlation with ground PM2.5: AOD/mixing height beats AOD in 10 of 12 cities (Lahore 0.43 against 0.02,
+  Delhi 0.59 against 0.37, Peshawar 0.49 against −0.11). The satellite NO₂ column correlates even better (Lahore 0.62,
+  Delhi 0.70, Karachi 0.77): NO₂ marks the same combustion sources and responds to the same mixing.
+- Model D, per city: Dhaka 0.77, Kolkata 0.76, Delhi 0.72, Islamabad 0.69, Kathmandu 0.68, Lahore 0.58, Peshawar 0.53.
+  RMSE is largest in Lahore (62 µg m⁻³) and Peshawar (59).
+- The estimate follows the ground seasonal cycle (`fig_pm25_cycle`) but is low in the worst months: Lahore's December
+  median is about 200 µg m⁻³ estimated against 250 observed. Regression pulls extremes towards the mean, and the worst
+  fog-and-smog days have no AOD at all, so they are not estimated.
+- Month effects carry part of the skill; the estimate is for days with a valid retrieval only.
