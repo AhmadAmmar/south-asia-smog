@@ -151,3 +151,30 @@ north-west wind are the transport signal.
 `fig_episode_peak`). The worst day on the plain was 11 November 2024 (plain-mean AOD 0.97): a continuous plume from the
 Punjab fires along the plain to Patna. Over Lahore itself both MAIAC and TROPOMI are blank that day: the densest smog
 and fog are flagged as cloud, so satellites miss the worst hours of the worst places.
+
+## 2026-11-15: more episodes, source leads over time, CDS access
+
+**Episodes, 20 Oct – 30 Nov of every year** (`figures/episode_<year>-10-20_<year>-11-30.gif`,
+`fig_episode_peak_<year>.png`). Worst day on the plain (plain-mean AOD, 25–32° N, 73–88° E, days with ≥ 30 % valid
+cells): 2019-11-27 (0.94), 2020-11-06 (0.67), 2021-11-06 (0.70), 2022-11-10 (0.91), 2023-11-20 (0.86),
+2024-11-11 (0.97), 2025-11-01 (0.74). The worst day is not in the years with most fire detections (2020, 2021): the
+plain-wide peak depends on stagnant weather as much as on fires.
+
+**Source leads, yearly enhancement over the 2° background** (µmol m⁻²; 2026 is January–October only):
+
+| Year | Nabinagar NO₂ | Nabinagar SO₂ | Chittorgarh NO₂ | Rihand NO₂ | Rihand SO₂ |
+|---|---|---|---|---|---|
+| 2019 | 11 | 48 | 31 | 258 | 750 |
+| 2021 | 25 | 87 | 32 | 243 | 652 |
+| 2023 | 31 | 118 | 45 | 255 | 668 |
+| 2025 | 25 | 73 | 50 | 260 | 586 |
+| 2026 | 25 | 56 | 46 | 245 | 430 |
+
+- Nabinagar: NO₂ and SO₂ rose from 2019 to 2023, as units came into operation. This supports a coal plant missing
+  from the 2019 inventory.
+- Chittorgarh: NO₂ up by half with little SO₂, consistent with growing industry (cement) rather than coal power.
+- Rihand: NO₂ flat but SO₂ down 43 % from 2019 to 2026, a sign of flue-gas desulphurisation coming into use at the
+  Singrauli plants. To confirm against plant records before stating it.
+
+**Copernicus CDS:** the key in `~/.cdsapirc` works and the ERA5 single-levels licence is accepted (test download on
+2026-11-15). This project gets ERA5 through Earth Engine, so it does not depend on CDS.

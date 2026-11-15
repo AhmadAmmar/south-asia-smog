@@ -3,7 +3,7 @@
     python src/40_episode_animation.py data/episode/2024-10-20_2024-11-30.npz
 
 Writes figures/episode_<start>_<end>.gif and a still of the worst day (highest plain-mean AOD) as
-figures/fig_episode_peak.png. Days without a valid retrieval stay blank (clouds, fog, or no overpass); nothing is
+figures/fig_episode_peak_<year>.png. Days without a valid retrieval stay blank (clouds, fog, or no overpass); nothing is
 filled in.
 """
 import sys
@@ -53,5 +53,5 @@ FuncAnimation(fig, frame, frames=len(dates), blit=False).save(out, writer=Pillow
 plain = (slice(int((ext[3] - 32) / S.RES), int((ext[3] - 25) / S.RES)), slice(int((73 - ext[0]) / S.RES), int((88 - ext[0]) / S.RES)))
 m = [np.nanmean(a[plain]) if np.isfinite(a[plain]).mean() > 0.3 else np.nan for a in A]
 k = int(np.nanargmax(m))
-frame(k); fig.savefig(S.FIG / "fig_episode_peak.png", bbox_inches="tight", dpi=150)
+frame(k); fig.savefig(S.FIG / f"fig_episode_peak_{dates[0][:4]}.png", bbox_inches="tight", dpi=150)
 print(out.name, "peak day", dates[k], round(m[k], 2), "valid-day plain AOD range", round(np.nanmin(m), 2), round(np.nanmax(m), 2))
