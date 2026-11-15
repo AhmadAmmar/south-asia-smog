@@ -62,3 +62,6 @@ signals (NO₂, aerosol, CO, fires, weather) lead and which follow?
 - The white patch in the south-west Arabian Sea is a MAIAC tile with no data, not clean air.
 - The satellite smog index for November 2025 is highest over the middle plain and the coal belts of Chhattisgarh and
   Odisha; Delhi and Dhaka stand out among cities.
+- The 429 errors were caused by the request itself: one reduceRegions per day meant 31 aggregations in one call.
+  Fix: the days of a month are stacked as bands (`toBands`) and reduced once; a month now takes about 5 s.
+  ERA5 2 m temperature is kept in kelvin.

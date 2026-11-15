@@ -4,7 +4,7 @@
 
 Satellite: daily mean of every Sentinel-5P and MAIAC variable in smoglib.VARS within 25 km of the centre, with the
 share of the circle that had a valid value that day (cover). Weather from ERA5 hourly (ECMWF/ERA5/HOURLY, days averaged):
-boundary layer height (m), 10 m wind speed (m/s), 2 m temperature (deg C), total precipitation (mm), surface pressure.
+boundary layer height (m), 10 m wind speed (m/s), 2 m temperature (K), total precipitation (mm), surface pressure.
 Mixing height and wind decide how far pollution is diluted, which is why winter smog sits low over the plain.
 """
 import time
@@ -20,25 +20,37 @@ PARTS = S.OUT / "city_daily_parts"
 PARTS.mkdir(parents=True, exist_ok=True)
 
 
+def stacked(daily, ndays, scale_m, cols):
+    """One reduceRegions over a month of daily images stacked as bands (d_col), instead of one per day: the restricted
+    Earth Engine project allows a single aggregation at a time. Returns a feature collection with one row per city."""
+    img = ee.ImageCollection(daily).toBands()
+    names = [f"{d}_{c}" for d in range(ndays) for c in cols]
+    return img.rename(names).reduceRegions(pts, ee.Reducer.mean(), scale_m)
+
+
+def ndays(year, month):
+    return (pd.Timestamp(year, month, 1) + pd.offsets.MonthEnd(0)).day
+
+
 def sat_month(var, year, month):
     coll, band, scale = S.VARS[var][:3]
     start = ee.Date.fromYMD(year, month, 1)
-    days = ee.List.sequence(0, start.advance(1, "month").difference(start, "day").subtract(1))
     c = ee.ImageCollection(coll).filterDate(start, start.advance(1, "month")).select(band)
 
     def per_day(d):
         d0 = start.advance(d, "day")
-        img = c.filterDate(d0, d0.advance(1, "day")).mean().multiply(scale)
-        img = ee.Image(ee.Algorithms.If(img.bandNames().size(), img.rename("v"), ee.Image().rename("v").toFloat()))
-        img = img.addBands(img.mask().rename("cover"))
-        fc = img.reduceRegions(pts, ee.Reducer.mean(), 1113.2)
-        return fc.map(lambda f: f.set("date", d0.format("YYYY-MM-dd")))
-    return ee.FeatureCollection(days.map(per_day)).flatten()
+        day = c.filterDate(d0, d0.advance(1, "day"))
+        img = ee.Image(ee.Algorithms.If(day.size(), day.mean().multiply(scale), ee.Image.constant(0).updateMask(0))).rename("v").toFloat()
+        return img.addBands(img.mask().rename("cover").toFloat())
+    n = ndays(year, month)
+    return stacked(ee.List.sequence(0, n - 1).map(per_day), n, 1113.2, ["v", "cover"]), ["v", "cover"]
+
+
+MET = ["boundary_layer_height", "temperature_2m", "surface_pressure", "wind", "precip", "u10", "v10"]
 
 
 def met_month(year, month):
     start = ee.Date.fromYMD(year, month, 1)
-    days = ee.List.sequence(0, start.advance(1, "month").difference(start, "day").subtract(1))
     h = ee.ImageCollection("ECMWF/ERA5/HOURLY").filterDate(start, start.advance(1, "month"))
 
     def per_day(d):
@@ -48,22 +60,29 @@ def met_month(year, month):
         u, v = x.select("u_component_of_wind_10m").mean(), x.select("v_component_of_wind_10m").mean()
         ws = x.map(lambda i: i.select("u_component_of_wind_10m").hypot(i.select("v_component_of_wind_10m"))).mean().rename("wind")
         p = x.select("total_precipitation").sum().multiply(1000).rename("precip")
-        img = m.addBands([ws, p, u.rename("u10"), v.rename("v10")])
-        return img.reduceRegions(pts, ee.Reducer.mean(), 27830).map(lambda f: f.set("date", d0.format("YYYY-MM-dd")))
-    return ee.FeatureCollection(days.map(per_day)).flatten()
+        return m.addBands([ws, p, u.rename("u10"), v.rename("v10")]).toFloat()
+    n = ndays(year, month)
+    return stacked(ee.List.sequence(0, n - 1).map(per_day), n, 27830, MET), MET
 
 
-def get(fc, cols):
+def get(req, year, month):
+    fc, cols = req
     for k in range(10):
         try:
-            rows = fc.getInfo()["features"]
-            return pd.DataFrame([{c: r["properties"].get(c) for c in cols} for r in rows])
+            feats = fc.getInfo()["features"]
+            break
         except Exception as e:
-            busy = "concurrent" in str(e) or "429" in str(e)      # the restricted project allows one aggregation at a time
+            busy = "concurrent" in str(e) or "429" in str(e)
             if k == 9 or not (busy or "timed out" in str(e).lower() or "deadline" in str(e).lower()):
                 raise
             print(f"  retry {k + 1}: {str(e)[:80]}", flush=True)
             time.sleep(min(60 * (k + 1), 600) if busy else 15 * 2 ** k)
+    rows = []
+    for f in feats:
+        p = f["properties"]
+        for d in range(ndays(year, month)):
+            rows.append({"city": p["city"], "date": f"{year}-{month:02d}-{d + 1:02d}", **{c: p.get(f"{d}_{c}") for c in cols}})
+    return pd.DataFrame(rows)
 
 
 if __name__ == "__main__":
@@ -74,9 +93,9 @@ if __name__ == "__main__":
                 continue
             t0 = time.time()
             if var == "met":
-                df = get(met_month(year, month), ["city", "date", "boundary_layer_height", "temperature_2m", "surface_pressure", "wind", "precip", "u10", "v10"])
+                df = get(met_month(year, month), year, month)
             else:
-                df = get(sat_month(var, year, month), ["city", "date", "v", "cover"]).rename(columns={"v": var, "cover": f"{var}_cover"})
+                df = get(sat_month(var, year, month), year, month).rename(columns={"v": var, "cover": f"{var}_cover"})
             df.to_csv(f, index=False)
             print(f"{var} {year}-{month:02d}: {len(df)} rows, {time.time() - t0:.0f}s", flush=True)
     parts = {}
