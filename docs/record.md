@@ -65,3 +65,33 @@ signals (NO₂, aerosol, CO, fires, weather) lead and which follow?
 - The 429 errors were caused by the request itself: one reduceRegions per day meant 31 aggregations in one call.
   Fix: the days of a month are stacked as bands (`toBands`) and reduced once; a month now takes about 5 s.
   ERA5 2 m temperature is kept in kelvin.
+
+## 2026-11-15: city daily series and charts
+
+`outputs/city_daily.csv`: 34 332 city-days (12 cities, 2019-01 to 2026-10), no retries needed after the stacking fix.
+
+**Smog-season ratios (Nov–Jan / Jul–Aug, `outputs/city_season_summary.csv`).** NO₂: Mumbai 4.9, Karachi 3.9,
+Dhaka 3.8, Delhi 2.9, Lahore 2.5. AOD: Patna 2.3, Dhaka 2.2, Kolkata 2.1, Lucknow 1.5, Delhi 1.2, Lahore 0.7,
+Islamabad 0.5, Peshawar 0.5. SO₂ and UV aerosol index ratios are meaningless (means near zero or negative) and are
+not used.
+
+**Annual cycles.** Delhi and Dhaka reach about 220 µmol m⁻² NO₂ in December–January, four times their August level.
+Lahore's AOD peaks in July (1.3, dust on the few cloud-free monsoon days) with a second peak in early November (1.05);
+Delhi's AOD peak is mid-November (1.3), the stubble-burning and Diwali weeks.
+
+**Weather (Spearman rank correlation on smog-season days):**
+
+| City | NO₂ – mixing height | NO₂ – wind | AOD – mixing height | AOD – wind | Median mixing height |
+|---|---|---|---|---|---|
+| Lahore | −0.56 | −0.32 | 0.15 | −0.42 | 201 m |
+| Delhi | −0.59 | −0.53 | 0.05 | −0.45 | 260 m |
+| Dhaka | −0.12 | −0.28 | 0.21 | 0.04 | 329 m |
+| Patna | −0.36 | −0.28 | −0.04 | −0.23 | 327 m |
+
+- NO₂ columns rise strongly as the mixing layer gets shallower in Lahore and Delhi; AOD does not. A shallow layer
+  concentrates particles near the ground without changing the column total, so column AOD cannot show the
+  surface effect; wind, which removes pollution, lowers both. Surface PM2.5 from AOD therefore needs AOD divided
+  by mixing height, not AOD alone. Part of the NO₂–mixing height link may be the shorter NO₂ lifetime in winter
+  (both peak in December); to separate, use anomalies from the daily climatology.
+- The chart title earlier claimed "a shallow mixing layer traps aerosol"; the data do not show it in column AOD, so
+  the title now states only what is plotted.

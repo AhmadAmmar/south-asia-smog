@@ -55,7 +55,7 @@ for c in ("Lahore", "Delhi", "Dhaka"):
     for ax, v in zip(axs, ("aod", "no2")):
         P = g.pivot_table(index="year", columns="doy", values=v)
         lo, hi = np.nanpercentile(P.values, [2, 98])
-        im = ax.imshow(P.values, aspect="auto", cmap="magma_r", vmin=lo, vmax=hi, extent=[0.5, P.columns.max() + 0.5, P.index.max() + 0.5, P.index.min() - 0.5])
+        im = ax.imshow(P.values, aspect="auto", cmap="magma_r", interpolation="nearest", vmin=lo, vmax=hi, extent=[0.5, P.columns.max() + 0.5, P.index.max() + 0.5, P.index.min() - 0.5])
         plt.colorbar(im, ax=ax, label=S.VARS[v][3] or v.upper(), pad=0.01)
         ax.set_ylabel("Year"); ax.set_title(f"{c}: {S.VARS[v][4]}, every day (white = no valid retrieval)")
     axs[1].set_xticks([1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], list("JFMAMJJASOND"))
@@ -65,13 +65,13 @@ for c in ("Lahore", "Delhi", "Dhaka"):
 if "boundary_layer_height" in d:
     fig, axs = plt.subplots(1, 2, figsize=(10, 4))
     for c, col in (("Lahore", "#D55E00"), ("Delhi", "#0072B2")):
-        g = d[(d.city == c) & (d.season == "smog")].dropna(subset=["aod", "boundary_layer_height", "wind"])
+        g = d[(d.city == c) & (d.season == "smog")].dropna(subset=["aod", "boundary_layer_height", "wind"]).query("aod > 0")
         axs[0].scatter(g.boundary_layer_height, g.aod, s=5, alpha=0.5, color=col, label=f"{c} (r = {np.corrcoef(np.log(g.boundary_layer_height), np.log(g.aod))[0, 1]:.2f}, log-log)")
         axs[1].scatter(g.wind, g.aod, s=5, alpha=0.5, color=col, label=f"{c} (r = {np.corrcoef(g.wind, np.log(g.aod))[0, 1]:.2f})")
     axs[0].set_xscale("log"); axs[0].set_yscale("log"); axs[1].set_yscale("log")
     axs[0].set_xlabel("Daily mean boundary layer height (m)"); axs[1].set_xlabel("Daily mean 10 m wind speed (m/s)")
     for ax in axs:
         ax.set_ylabel("AOD"); ax.legend(fontsize=7, frameon=False)
-    fig.suptitle("Smog season days: a shallow mixing layer and calm air trap aerosol")
+    fig.suptitle("Smog season (Nov–Jan) days: column AOD against ERA5 mixing height and wind")
     save(fig, "fig_weather")
 print("written")
