@@ -54,14 +54,16 @@ def met_month(year, month):
 
 
 def get(fc, cols):
-    for k in range(6):
+    for k in range(10):
         try:
             rows = fc.getInfo()["features"]
             return pd.DataFrame([{c: r["properties"].get(c) for c in cols} for r in rows])
         except Exception as e:
-            if k == 5:
+            busy = "concurrent" in str(e) or "429" in str(e)      # the restricted project allows one aggregation at a time
+            if k == 9 or not (busy or "timed out" in str(e).lower() or "deadline" in str(e).lower()):
                 raise
-            time.sleep(15 * 2 ** k)
+            print(f"  retry {k + 1}: {str(e)[:80]}", flush=True)
+            time.sleep(min(60 * (k + 1), 600) if busy else 15 * 2 ** k)
 
 
 if __name__ == "__main__":

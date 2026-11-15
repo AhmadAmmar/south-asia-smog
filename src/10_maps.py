@@ -34,7 +34,10 @@ def load(var):
     for f in sorted((S.DATA / "grids" / var).glob("*.npz")):
         y, m = map(int, f.stem.split("-"))
         z = np.load(f)
-        out[(y, m)] = (z["mean"], z["n"])
+        a, n = z["mean"].astype(float), z["n"].astype(float)
+        bad = ~np.isfinite(a)                 # cells with no valid day arrive as -inf (masked pixels), not NaN
+        a[bad], n[bad | ~np.isfinite(n)] = np.nan, 0
+        out[(y, m)] = (a, n)
     return out
 
 
