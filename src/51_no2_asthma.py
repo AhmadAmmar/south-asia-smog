@@ -36,6 +36,7 @@ def monitors(years):
     s = s[(s.param.str.lower() == "no2") & (s.monitor == True)]
     d = pd.read_csv(O / "openaq_region_daily.csv")
     d = d[d.sensor.isin(s.sensor)]
+    d = d[(d.value > 0) & (d.value < 500)]          # drop impossible daily values (some sensors report 1e20-type errors)
     d["year"] = d.date.str[:4].astype(int)
     a = d[d.year.isin(years)].groupby(["sensor", "year"]).agg(no2=("value", "mean"), days=("value", "size")).reset_index()
     a = a[a.days >= 180].merge(s[["sensor", "location", "country", "lon", "lat"]], on="sensor")
