@@ -23,6 +23,7 @@ API = "https://api.openaq.org/v3"
 
 
 def key():
+    """OpenAQ API key from the environment, else the Windows user environment in the registry."""
     k = os.environ.get("OPENAQ_API_KEY")
     if not k:
         import winreg
@@ -36,6 +37,7 @@ SES.headers["X-API-Key"] = key()
 
 
 def get(path, **params):
+    """JSON of an OpenAQ API path, retrying on rate limits and server errors."""
     for k in range(6):
         r = SES.get(f"{API}/{path}", params=params, timeout=60)
         if r.status_code == 429 or r.status_code >= 500:
@@ -47,6 +49,7 @@ def get(path, **params):
 
 
 def sensors(city, lon, lat):
+    """PM2.5 sensors within 25 km of a city, with location and provider."""
     locs = get("locations", coordinates=f"{lat},{lon}", radius=25000, limit=1000, parameters_id=2)["results"]
     rows = []
     for l in locs:
@@ -67,6 +70,7 @@ def sensors(city, lon, lat):
 
 
 def daily(sensor):
+    """Daily values of one sensor from 2019 to today, all pages."""
     out, page = [], 1
     while True:
         j = get(f"sensors/{sensor}/days", date_from="2019-01-01", date_to=pd.Timestamp.today().strftime("%Y-%m-%d"), limit=1000, page=page)

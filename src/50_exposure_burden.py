@@ -41,6 +41,7 @@ CF = 5.0
 
 
 def district_stats(years):
+    """Population and population-weighted PM2.5 per district (geoBoundaries ADM2) and year, from Earth Engine."""
     import ee
     ee.Initialize(project="ee-ahmadammargeo")
     adm = ee.FeatureCollection("WM/geoLab/geoBoundaries/600/ADM2").filter(ee.Filter.inList("shapeGroup", ISO))
@@ -66,6 +67,9 @@ def district_stats(years):
 
 
 def burden(d):
+    """District population and deaths (GPW pattern scaled to UN WPP country totals), population-weighted
+    PM2.5, shares above thresholds, cigarette equivalent (22 ug/m3 per cigarette), life years lost (0.098 per ug/m3
+    above CF) and deaths attributable to PM2.5 by AF = 1 - RR^-(excess/10), with low and high bounds."""
     wpp = pd.read_csv(R / "data/raw/wpp/WPP2024_Demographic_Indicators_Medium.csv.gz", low_memory=False)
     wpp = wpp[wpp.ISO3_code.isin(ISO)][["ISO3_code", "Time", "TPopulation1July", "Deaths"]]
     wpp.columns = ["shapeGroup", "year", "wpp_pop_k", "wpp_deaths_k"]
@@ -89,6 +93,7 @@ def burden(d):
 
 
 def summaries(d):
+    """Country-year totals: population, population-weighted PM2.5 and attributable deaths."""
     g = d.groupby(["shapeGroup", "year"])
     c = g.apply(lambda x: pd.Series({"population_m": x.population.sum() / 1e6,
                                      "pm25_popw": np.average(x.pm25_popw, weights=x.population),
@@ -102,6 +107,7 @@ def summaries(d):
 
 
 def figures(d, c):
+    """Maps and charts of exposure and burden."""
     import geopandas as gpd
     import matplotlib
     matplotlib.use("Agg")
@@ -140,6 +146,7 @@ def figures(d, c):
 
 
 def main(years):
+    """Exposure and burden for the years, reusing years already computed."""
     raw = O / "exposure_district_raw.csv"
     have = pd.read_csv(raw) if raw.exists() else pd.DataFrame()
     todo = [y for y in years if have.empty or y not in set(have.year)]

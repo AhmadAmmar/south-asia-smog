@@ -28,10 +28,12 @@ FOCUS = ["Lahore", "Delhi", "Dhaka", "Patna", "Kolkata", "Peshawar"]
 
 
 def save(fig, name):
+    """Save a figure as PNG and PDF."""
     fig.savefig(S.FIG / f"{name}.png", bbox_inches="tight"); fig.savefig(S.FIG / f"{name}.pdf", bbox_inches="tight"); plt.close(fig)
 
 
 def anomalies(g, cols):
+    """Columns as anomalies from their day-of-year means."""
     out = g.copy()
     for c in cols:
         clim = g.groupby("doy")[c].mean().reindex(range(1, 367))

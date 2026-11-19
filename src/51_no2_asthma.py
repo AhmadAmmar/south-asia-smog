@@ -32,6 +32,7 @@ MOL_TO_UGM3 = None  # surface concentrations come from monitors in ug/m3; the co
 
 
 def monitors(years):
+    """Annual NO2 at reference monitors from the OpenAQ regional download."""
     s = pd.read_csv(O / "openaq_region_sensors.csv")
     s = s[(s.param.str.lower() == "no2") & (s.monitor == True)]
     d = pd.read_csv(O / "openaq_region_daily.csv")
@@ -51,6 +52,7 @@ def monitors(years):
 
 
 def predictors(a, years):
+    """Satellite NO2 column and log population density at the monitors, from Earth Engine."""
     import ee
     ee.Initialize(project="ee-ahmadammargeo")
     dens = ee.ImageCollection("CIESIN/GPWv411/GPW_Population_Density").filter(ee.Filter.calendarRange(2020, 2020, "year")).first().max(1).log10().rename("logdens")
@@ -69,6 +71,7 @@ def predictors(a, years):
 
 
 def calibrate(m):
+    """Linear fit of surface NO2 on column NO2 and log population density."""
     m = m.dropna(subset=["col", "logdens", "no2"])
     X = np.column_stack([np.ones(len(m)), m.col, m.logdens]); yv = m.no2.values
     coef = np.linalg.lstsq(X, yv, rcond=None)[0]
@@ -85,6 +88,8 @@ def calibrate(m):
 
 
 def districts(coef, years):
+    """Calibrated surface NO2 per district and year, population weighted, and the share of children's asthma
+    attributable to it: AF = 1 - RR^-(max(0, ppb - 2)/10), RR 1.26 (1.10-1.37)."""
     import ee
     ee.Initialize(project="ee-ahmadammargeo")
     adm = ee.FeatureCollection("WM/geoLab/geoBoundaries/600/ADM2").filter(ee.Filter.inList("shapeGroup", ISO))
@@ -121,6 +126,7 @@ def districts(coef, years):
 
 
 def figures(d):
+    """Maps and charts of NO2 and the attributable shares."""
     import geopandas as gpd
     import matplotlib
     matplotlib.use("Agg")
@@ -139,6 +145,7 @@ def figures(d):
 
 
 def main(years):
+    """Surface NO2 by district from the calibrated satellite column, and the attributable shares."""
     a = monitors(years)
     m = predictors(a, years)
     coef = calibrate(m)

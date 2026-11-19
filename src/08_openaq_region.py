@@ -21,6 +21,7 @@ BOXES = [(w, s, w + 4, s + 4) for w in range(60, 98, 4) for s in range(5, 37, 4)
 
 
 def locations():
+    """OpenAQ locations and sensors of each parameter in each regional box."""
     rows = []
     for b in BOXES:
         for pid, name in PARAM.items():
@@ -45,6 +46,7 @@ def locations():
 
 
 def series(sensor, start):
+    """Daily values of one sensor from start to yesterday, all pages."""
     out, page = [], 1
     end = (pd.Timestamp.today() - pd.Timedelta(days=1)).strftime("%Y-%m-%d")
     while True:

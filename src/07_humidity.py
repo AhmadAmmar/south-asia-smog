@@ -16,6 +16,7 @@ pts = ee.FeatureCollection([ee.Feature(ee.Geometry.Point(xy).buffer(25000), {"ci
 
 
 def rh(i):
+    """Relative humidity (%) of an ERA5 image from 2 m temperature and dewpoint (Magnus form, 17.625 and 243.04)."""
     t = i.select("temperature_2m").subtract(273.15)
     td = i.select("dewpoint_temperature_2m").subtract(273.15)
     e = td.multiply(17.625).divide(td.add(243.04)).exp()
@@ -24,10 +25,12 @@ def rh(i):
 
 
 def day_rh(x):
+    """Mean relative humidity of a day's images, or a masked image."""
     return ee.Image(ee.Algorithms.If(x.size(), x.map(rh).mean().toFloat(), ee.Image.constant(0).rename("rh").updateMask(0).toFloat()))
 
 
 def month(y, m):
+    """Daily relative humidity at the cities for one month, up to yesterday."""
     start = ee.Date.fromYMD(y, m, 1)
     end = min(pd.Timestamp(y, m, 1) + pd.offsets.MonthEnd(0), pd.Timestamp.today().normalize() - pd.Timedelta(days=1))
     n = end.day

@@ -35,11 +35,13 @@ def ndays(year, month):
 
 
 def sat_month(var, year, month):
+    """Daily city values of a satellite variable for one month (a masked image on days without data)."""
     coll, band, scale = S.VARS[var][:3]
     start = ee.Date.fromYMD(year, month, 1)
     c = ee.ImageCollection(coll).filterDate(start, start.advance(1, "month")).select(band)
 
     def per_day(d):
+        """Scaled mean of one day's images, or a masked image."""
         d0 = start.advance(d, "day")
         day = c.filterDate(d0, d0.advance(1, "day"))
         img = ee.Image(ee.Algorithms.If(day.size(), day.mean().multiply(scale), ee.Image.constant(0).updateMask(0))).rename("v").toFloat()
@@ -52,10 +54,14 @@ MET = ["boundary_layer_height", "temperature_2m", "surface_pressure", "wind", "p
 
 
 def met_month(year, month):
+    """Daily ERA5 boundary-layer height, 2 m temperature, surface pressure, 10 m wind speed and
+    components, and precipitation (mm) at the cities for a month."""
     start = ee.Date.fromYMD(year, month, 1)
     h = ee.ImageCollection("ECMWF/ERA5/HOURLY").filterDate(start, start.advance(1, "month"))
 
     def per_day(d):
+        """Daily means of the hourly ERA5 fields, mean wind speed and total precipitation (mm); masked if
+            ERA5 has no data yet."""
         d0 = start.advance(d, "day")
         x = h.filterDate(d0, d0.advance(1, "day"))
         m = x.select(["boundary_layer_height", "temperature_2m", "surface_pressure"]).mean()
@@ -70,6 +76,7 @@ def met_month(year, month):
 
 
 def get(req, year, month):
+    """Values of a city request (features and columns) for one month, up to ten attempts."""
     fc, cols = req
     for k in range(10):
         try:

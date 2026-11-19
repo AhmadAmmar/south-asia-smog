@@ -22,6 +22,9 @@ GRID = S.grid()
 
 
 def daily_mean(coll, band, scale, y, m):
+    """Monthly mean of a satellite band on the study grid from daily means (scaled), with the number of
+        days that had data.
+    """
     start = ee.Date.fromYMD(y, m, 1)
     end = start.advance(1, "month")
     c = ee.ImageCollection(coll).filterDate(start, end).select(band)
@@ -29,6 +32,7 @@ def daily_mean(coll, band, scale, y, m):
     days = ee.List.sequence(0, ndays.subtract(1))
 
     def per_day(d):
+        """Mean of one day's images, or nothing when the day has none."""
         d0 = start.advance(d, "day")
         day = c.filterDate(d0, d0.advance(1, "day"))
         # a day with no images gives an image with no bands; it is dropped by the filter below
@@ -38,6 +42,8 @@ def daily_mean(coll, band, scale, y, m):
 
 
 def fires(y, m):
+    """FIRMS fires (confidence 50% or more) over a month: mean brightness temperature (T21) and the number
+    of 1 km fire pixels summed into each grid cell."""
     start = ee.Date.fromYMD(y, m, 1)
     c = ee.ImageCollection("FIRMS").filterDate(start, start.advance(1, "month"))
     hot = c.map(lambda i: i.select("T21").updateMask(i.select("confidence").gte(50)))
@@ -49,6 +55,7 @@ def fires(y, m):
 
 
 def fetch(img, tries=6):
+    """Pixels of an image on the study grid as arrays, up to six attempts."""
     for k in range(tries):
         try:
             raw = ee.data.computePixels({"expression": img, "fileFormat": "NPY", "grid": GRID})
@@ -64,6 +71,7 @@ def fetch(img, tries=6):
 
 
 def save(var, y, m, a):
+    """Save a month's mean and count grids of a variable as a compressed .npz file."""
     out = S.DATA / "grids" / var
     out.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(out / f"{y}-{m:02d}.npz", mean=a["mean"].astype("float32"), n=a["n"].astype("float32"))

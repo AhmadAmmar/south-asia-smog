@@ -21,6 +21,7 @@ VARS = [v for v in S.VARS if v in d]
 
 
 def save(fig, name):
+    """Save a figure as PNG and PDF."""
     fig.savefig(S.FIG / f"{name}.png", bbox_inches="tight"); fig.savefig(S.FIG / f"{name}.pdf", bbox_inches="tight"); plt.close(fig)
 
 

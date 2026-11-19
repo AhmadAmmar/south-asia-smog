@@ -41,6 +41,7 @@ title = fig.suptitle("")
 
 
 def frame(i):
+    """Update the animation to day i: AOD, NO2 and fire points."""
     ims[0].set_data(A[i]); ims[1].set_data(N[i])
     yy, xx = np.nonzero(np.nan_to_num(F[i]) > 0)
     sc.set_offsets(np.c_[lon[xx], lat[yy]] if len(xx) else np.empty((0, 2)))

@@ -30,6 +30,7 @@ SMOG, MONSOON = (11, 12, 1), (7, 8)
 
 
 def load(var):
+    """Monthly grids of a variable: {(year, month): (mean, count)}."""
     out = {}
     for f in sorted((S.DATA / "grids" / var).glob("*.npz")):
         y, m = map(int, f.stem.split("-"))
@@ -42,12 +43,14 @@ def load(var):
 
 
 def label(var):
+    """Title and units of a variable."""
     if var == "fire":
         return "Fire detections per cell per month", ""
     return S.VARS[var][4], S.VARS[var][3]
 
 
 def axes_map(ax, title):
+    """Map axes over the study extent with coastlines and borders."""
     ax.set_extent(EXT, ccrs.PlateCarree())
     ax.add_feature(cfeature.COASTLINE.with_scale("10m"), lw=0.4)
     ax.add_feature(BORDERS, lw=0.3, edgecolor="#555")
@@ -55,6 +58,7 @@ def axes_map(ax, title):
 
 
 def draw(ax, a, var, vmin=None, vmax=None, cmap=None, title="", cb=True):
+    """Draw a grid on map axes, colour range 2nd-98th percentile unless given, with a colour bar."""
     axes_map(ax, title)
     vmin = np.nanpercentile(a, 2) if vmin is None else vmin
     vmax = np.nanpercentile(a, 98) if vmax is None else vmax
@@ -66,6 +70,7 @@ def draw(ax, a, var, vmin=None, vmax=None, cmap=None, title="", cb=True):
 
 
 def season_mean(g, months, years=None):
+    """Mean of the monthly grids in the given months (and years), or None."""
     stack = [v[0] for (y, m), v in g.items() if m in months and (years is None or y in years)]
     return np.nanmean(stack, axis=0) if stack else None
 
@@ -79,10 +84,12 @@ def winter_mean(g, w):
 
 
 def save(fig, name):
+    """Save a figure as PNG and PDF."""
     fig.savefig(S.FIG / f"{name}.png", bbox_inches="tight"); fig.savefig(S.FIG / f"{name}.pdf", bbox_inches="tight"); plt.close(fig)
 
 
 def fig_smog_from_space(G, y=None, m=11):
+    """Figure: AOD, UV aerosol index, NO2, CO, HCHO and fires in one month (default November of the latest year)."""
     y = y or max(yy for (yy, mm) in G["no2"] if mm == m)
     vs = [v for v in ("aod", "uvai", "no2", "co", "hcho", "fire") if v in G and (y, m) in G[v]]
     fig, axs = plt.subplots(2, 3, figsize=(13, 8), subplot_kw={"projection": ccrs.PlateCarree()})
@@ -104,6 +111,7 @@ def fig_smog_from_space(G, y=None, m=11):
 
 
 def fig_season(G, var):
+    """Figure: smog-season mean against monsoon mean of a variable, and their difference."""
     g = G[var]
     a, b = season_mean(g, SMOG), season_mean(g, MONSOON)
     if a is None or b is None:
@@ -124,6 +132,7 @@ def fig_season(G, var):
 
 
 def fig_monthly(G, var):
+    """Figure: the twelve monthly climatology maps of a variable."""
     g = G[var]
     fig, axs = plt.subplots(3, 4, figsize=(14, 9), subplot_kw={"projection": ccrs.PlateCarree()})
     clim = {m: season_mean(g, (m,)) for m in range(1, 13)}
@@ -138,6 +147,7 @@ def fig_monthly(G, var):
 
 
 def fig_hovmoller(G, vars_=("no2", "aod")):
+    """Figure: time-longitude diagram of variables averaged over 24-32 deg N."""
     band = (LAT >= 24) & (LAT <= 32)
     fig, axs = plt.subplots(1, len(vars_), figsize=(6 * len(vars_), 7), sharey=True)
     for ax, var in zip(np.atleast_1d(axs), vars_):
@@ -177,6 +187,7 @@ def fig_index(G, y=None, m=11):
 
 
 def fig_trend(G, var):
+    """Figure: Theil-Sen trend of November values of a variable per cell."""
     from scipy.stats import theilslopes
     g = G[var]
     winters = sorted({y for (y, m) in g if m == 11})

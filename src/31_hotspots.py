@@ -37,6 +37,7 @@ COL = {"coal power": "#000000", "gas/oil power": "#0072B2", "city": "#D55E00", "
 
 
 def load(var, months=None):
+    """Mean of a variable's monthly grids (optionally only some months)."""
     stack = []
     for f in sorted((S.DATA / "grids" / var).glob("*.npz")):
         if months and int(f.stem[-2:]) not in months:
@@ -48,15 +49,19 @@ def load(var, months=None):
 
 
 def enhancement(a):
+    """Grid minus its 21-cell median background."""
     bg = ndimage.generic_filter(np.nan_to_num(a, nan=np.nanmedian(a)), np.median, size=21, mode="nearest")
     return a - bg
 
 
 def km(lon0, lat0, lon, lat):
+    """Distance in km from one point to others (equirectangular)."""
     return 111.2 * np.hypot((lon - lon0) * np.cos(np.radians(lat0)), lat - lat0)
 
 
 def attribute(lon, lat):
+    """Likely source of a hotspot: the nearest power plant within 30 km, else the nearest city within 30 km,
+    else unattributed; returns (kind, description)."""
     d = km(lon, lat, PP.lon.values, PP.lat.values)
     if len(d) and d.min() <= 30:
         p = PP.iloc[d.argmin()]
@@ -69,6 +74,7 @@ def attribute(lon, lat):
 
 
 def hotspots(var, k=4.0, top=30):
+    """Cells whose enhancement exceeds k robust standard deviations (MAD x 1.4826), top cells attributed."""
     a = load(var)
     e = enhancement(a)
     sd = 1.4826 * np.nanmedian(np.abs(e - np.nanmedian(e)))
@@ -86,12 +92,14 @@ def hotspots(var, k=4.0, top=30):
 
 
 def axes_map(ax):
+    """Map axes over the study extent with coastlines and borders."""
     ax.set_extent(EXT, ccrs.PlateCarree())
     ax.add_feature(cfeature.COASTLINE.with_scale("10m"), lw=0.4)
     ax.add_feature(cfeature.BORDERS.with_scale("10m"), lw=0.3, edgecolor="#555")
 
 
 def fig_hot(var, e, sd, h):
+    """Figure: enhancement map with hotspots and their table."""
     fig = plt.figure(figsize=(12, 7.5))
     ax = fig.add_axes([0.02, 0.05, 0.6, 0.9], projection=ccrs.PlateCarree())
     axes_map(ax)

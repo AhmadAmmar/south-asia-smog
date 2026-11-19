@@ -22,6 +22,7 @@ GRID = {"dimensions": {"width": NX, "height": NY}, "affineTransform": {"scaleX":
 
 
 def daily(var, d0):
+    """One day's image of a variable for the episode (fire: FIRMS detections at 50% confidence or more)."""
     if var == "fire":
         c = ee.ImageCollection("FIRMS").filterDate(d0, d0.advance(1, "day"))
         hot = c.map(lambda i: i.select("confidence").gte(50).selfMask().rename("v"))
@@ -35,6 +36,7 @@ def daily(var, d0):
 
 
 def stack(var, start, n):
+    """Daily images of a variable over n days from start, stacked and fetched (up to eight attempts)."""
     s = ee.Date(start)
     img = ee.ImageCollection(ee.List.sequence(0, n - 1).map(lambda d: daily(var, s.advance(d, "day")))).toBands()
     for k in range(8):

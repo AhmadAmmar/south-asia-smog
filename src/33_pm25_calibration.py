@@ -48,6 +48,8 @@ MODELS = {"A": ["x_aod"], "B": ["x_aod", "x_blh", "x_rh"], "C": ["x_aod", "x_blh
 
 
 def design(df, terms, cities):
+    """Design matrix: one intercept per city, then month dummies (February to December) or the named
+    columns."""
     cols = [np.asarray(df.city == c, float) for c in cities]
     for t in terms:
         if t == "month":
@@ -58,6 +60,7 @@ def design(df, terms, cities):
 
 
 def fit(df, terms, cities):
+    """Least-squares fit of PM2.5 on the design; coefficients and the Duan smearing factor (mean of exp(residual))."""
     X = design(df, terms, cities)
     beta, *_ = np.linalg.lstsq(X, df.y.values, rcond=None)
     resid = df.y.values - X @ beta

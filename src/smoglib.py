@@ -45,11 +45,13 @@ def fresh(y, m, months_back=2):
 
 
 def init():
+    """Start Earth Engine with a three-minute request deadline."""
     ee.Initialize(project=PROJECT)
     ee.data.setDeadline(180000)          # no request may hang for more than 3 minutes; callers retry
 
 
 def grid():
+    """The study grid as an Earth Engine pixel grid (EPSG:4326)."""
     return {"dimensions": {"width": NX, "height": NY}, "affineTransform": dict(zip(
         ["scaleX", "shearX", "translateX", "shearY", "scaleY", "translateY"], TRANSFORM)), "crsCode": "EPSG:4326"}
 

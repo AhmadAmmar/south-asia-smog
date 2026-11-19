@@ -20,6 +20,7 @@ COLS = ["terra_day", "terra_night", "aqua_day", "aqua_night"]
 
 
 def day_image(d0):
+    """MODIS Terra and Aqua fire masks of one day."""
     out = []
     for coll in ("MODIS/061/MOD14A1", "MODIS/061/MYD14A1"):
         c = ee.ImageCollection(coll).filterDate(d0, d0.advance(1, "day"))
@@ -31,6 +32,7 @@ def day_image(d0):
 
 
 def season(year):
+    """Daily fire images from 15 September for 92 days of a year, stacked as bands."""
     start = ee.Date.fromYMD(year, 9, 15)
     n = 92
     stack = ee.ImageCollection(ee.List.sequence(0, n - 1).map(lambda d: day_image(start.advance(d, "day")))).toBands()

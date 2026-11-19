@@ -24,6 +24,7 @@ BOX = {"Lahore": (74.1, 74.6, 31.3, 31.7, "Lahore"), "Delhi": (76.8, 77.4, 28.4,
 
 
 def load():
+    """Daily PM2.5 of the regional sensors (values 0-1000) with sensor details."""
     s = pd.read_csv(R / "outputs/openaq_region_sensors.csv"); s = s[s.param == "pm25"]
     d = pd.read_csv(R / "outputs/openaq_region_daily.csv"); d = d[d.sensor.isin(s.sensor) & (d.value > 0) & (d.value < 1000)]
     d = d.merge(s[["sensor", "monitor", "provider", "lon", "lat"]], on="sensor")
@@ -32,6 +33,7 @@ def load():
 
 
 def citymean(x, y, window=False):
+    """Mean PM2.5 of a year (optionally only to 14 November)."""
     z = x[x.year == y]
     if window:
         z = z[z.md <= "11-14"]
@@ -39,6 +41,7 @@ def citymean(x, y, window=False):
 
 
 def same_sensor(x, a, b):
+    """Year-on-year change at sensors with 150 or more days in both years, to 14 November."""
     z = x[x.year.isin([a, b]) & (x.md <= "11-14")]
     g = z.groupby(["sensor", "year"]).value.agg(["mean", "size"]).unstack()
     g = g.dropna(); g = g[(g["size"][a] >= 150) & (g["size"][b] >= 150)]
@@ -46,6 +49,7 @@ def same_sensor(x, a, b):
 
 
 def main():
+    """City update: this season against last, at the same sensors, with district exposure."""
     d = load()
     ex = pd.read_csv(R / "outputs/exposure_district_year.csv")
     rows = []
