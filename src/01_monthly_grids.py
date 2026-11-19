@@ -23,7 +23,7 @@ GRID = S.grid()
 
 def daily_mean(coll, band, scale, y, m):
     """Monthly mean of a satellite band on the study grid from daily means (scaled), with the number of
-        days that had data.
+    days that had data.
     """
     start = ee.Date.fromYMD(y, m, 1)
     end = start.advance(1, "month")

@@ -61,7 +61,7 @@ def met_month(year, month):
 
     def per_day(d):
         """Daily means of the hourly ERA5 fields, mean wind speed and total precipitation (mm); masked if
-            ERA5 has no data yet."""
+        ERA5 has no data yet."""
         d0 = start.advance(d, "day")
         x = h.filterDate(d0, d0.advance(1, "day"))
         m = x.select(["boundary_layer_height", "temperature_2m", "surface_pressure"]).mean()
