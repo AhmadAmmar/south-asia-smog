@@ -1,0 +1,47 @@
+region,year,fires,d10,d50,d90,share_nov
+India: Punjab + Haryana,2003,19628,283,293,305,0.109
+India: Punjab + Haryana,2004,17102,283,296,306,0.117
+India: Punjab + Haryana,2005,30662,285,299,313,0.345
+India: Punjab + Haryana,2006,19937,279,295,309,0.225
+India: Punjab + Haryana,2007,29589,282,297,309,0.239
+India: Punjab + Haryana,2008,26704,288,304,312,0.423
+India: Punjab + Haryana,2009,25171,289,301,315,0.383
+India: Punjab + Haryana,2010,24663,290,306,316,0.579
+India: Punjab + Haryana,2011,27183,289,302,311,0.379
+India: Punjab + Haryana,2012,30297,292,307,317,0.565
+India: Punjab + Haryana,2013,24973,294,304,317,0.484
+India: Punjab + Haryana,2014,31046,294,306,317,0.644
+India: Punjab + Haryana,2015,23085,293,308,319,0.608
+India: Punjab + Haryana,2016,33261,292,307,318,0.519
+India: Punjab + Haryana,2017,21624,291,304,326,0.448
+India: Punjab + Haryana,2018,24464,297,309,321,0.674
+India: Punjab + Haryana,2019,18758,295,304,321,0.493
+India: Punjab + Haryana,2020,31709,295,307,317,0.602
+India: Punjab + Haryana,2021,35295,301,311,319,0.793
+India: Punjab + Haryana,2022,19369,297,308,320,0.644
+India: Punjab + Haryana,2023,14848,302,312,323,0.823
+India: Punjab + Haryana,2024,6582,303,315,325,0.847
+India: Punjab + Haryana,2025,5934,299,308,316,0.728
+Pakistan: Punjab,2003,1644,296,324,342,0.824
+Pakistan: Punjab,2004,1979,304,323,345,0.879
+Pakistan: Punjab,2005,2655,305,325,342,0.902
+Pakistan: Punjab,2006,1040,285,325,343,0.831
+Pakistan: Punjab,2007,1424,286,316,342,0.783
+Pakistan: Punjab,2008,2239,298,321,338,0.843
+Pakistan: Punjab,2009,2240,281,320,339,0.657
+Pakistan: Punjab,2010,1964,289,317,333,0.854
+Pakistan: Punjab,2011,1887,284,318,343,0.72
+Pakistan: Punjab,2012,2015,282,315,337,0.619
+Pakistan: Punjab,2013,2513,298,320,343,0.815
+Pakistan: Punjab,2014,2810,290,320,340,0.78
+Pakistan: Punjab,2015,2414,293,317,337,0.787
+Pakistan: Punjab,2016,3184,291,318,340,0.753
+Pakistan: Punjab,2017,3468,281,323,334,0.664
+Pakistan: Punjab,2018,3496,282,310,327,0.62
+Pakistan: Punjab,2019,2989,290,310,337,0.647
+Pakistan: Punjab,2020,4511,283,311,335,0.639
+Pakistan: Punjab,2021,7225,287,309,329,0.644
+Pakistan: Punjab,2022,3994,290,306,336,0.564
+Pakistan: Punjab,2023,4051,286,315,334,0.748
+Pakistan: Punjab,2024,3654,286,308,328,0.607
+Pakistan: Punjab,2025,3707,287,305,317,0.504
